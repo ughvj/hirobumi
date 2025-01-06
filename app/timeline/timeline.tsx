@@ -1,7 +1,7 @@
 // app/components/Timeline.tsx
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -47,41 +47,6 @@ const Timeline = () => {
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(
     null
   );
-  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
-    null
-  );
-  const [isMobile, setIsMobile] = useState(false);
-
-  // デバイス検出
-  React.useEffect(() => {
-    setIsMobile("ontouchstart" in window);
-  }, []);
-
-  // タッチ開始時の処理
-  const handleTouchStart = useCallback((event: TimelineEvent) => {
-    const timer = setTimeout(() => {
-      setSelectedEvent(event);
-    }, 500); // 500ms の長押しで発火
-    setLongPressTimer(timer);
-  }, []);
-
-  // タッチ終了時の処理
-  const handleTouchEnd = useCallback(() => {
-    if (longPressTimer) {
-      clearTimeout(longPressTimer);
-      setLongPressTimer(null);
-    }
-  }, [longPressTimer]);
-
-  // クリック/タップハンドラー
-  const handleInteraction = useCallback(
-    (event: TimelineEvent) => {
-      if (!isMobile) {
-        setSelectedEvent(event);
-      }
-    },
-    [isMobile]
-  );
 
   return (
     <>
@@ -105,11 +70,8 @@ const Timeline = () => {
                 }`}
               >
                 <div
-                  className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer touch-manipulation"
-                  onClick={() => handleInteraction(event)}
-                  onTouchStart={() => handleTouchStart(event)}
-                  onTouchEnd={handleTouchEnd}
-                  onTouchCancel={handleTouchEnd}
+                  className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                  onClick={() => setSelectedEvent(event)}
                 >
                   <h3 className="text-xl font-bold text-blue-600">
                     {event.year}
