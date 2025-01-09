@@ -146,7 +146,7 @@ const Timeline = () => {
       <header className="fixed top-0 left-0 right-0 h-16 bg-white shadow-md z-50">
         <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
           {/* 左側：メニューとロゴ */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-0">
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
                 <button className="p-2 hover:bg-gray-100 rounded-full">
@@ -188,10 +188,11 @@ const Timeline = () => {
               </SheetContent>
             </Sheet>
             <Image
-              src="/logo.png" // 画像のURL (publicディレクトリにある場合は相対パス)
+              src="/logo.png"
               alt="説明テキスト"
-              width={100} // 表示する幅
-              height={100} // 表示する高さ
+              width={500}
+              height={500}
+              className="h-12 w-auto object-contain"
             />
           </div>
 
