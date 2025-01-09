@@ -20,6 +20,8 @@ import {
 
 import timelineData from "./events.json";
 
+import Image from "next/image";
+
 interface TimelineEvent {
   year: number;
   title: string;
@@ -164,7 +166,12 @@ const Timeline = () => {
               </nav>
             </SheetContent>
           </Sheet>
-          <div className="ml-4 text-xl font-bold">Timeline Logo</div>
+          <Image
+            src="/logo.png" // 画像のURL (publicディレクトリにある場合は相対パス)
+            alt="説明テキスト"
+            width={100} // 表示する幅
+            height={100} // 表示する高さ
+          />
         </div>
       </header>
 
