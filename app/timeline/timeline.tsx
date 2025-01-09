@@ -240,39 +240,28 @@ const Timeline = () => {
       {/* タイムラインコンテンツ */}
       <div className="pt-28 pb-12" ref={timelineRef}>
         <div className="max-w-lg mx-auto px-4">
-          <div className="relative pl-8">
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-blue-200" />
-
-            {timelineData.map((event, index) => (
+          {timelineData.map((event) => (
+            <div
+              key={event.id}
+              className={`timeline-item relative mb-8 ${
+                highlightedEventId === event.id ? "animate-highlight" : ""
+              }`}
+              data-year={event.year}
+            >
               <div
-                key={event.id}
-                className={`timeline-item relative mb-8 ${
-                  highlightedEventId === event.id ? "animate-highlight" : ""
-                }`}
-                data-year={event.year}
+                className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer touch-manipulation"
+                onClick={() => handleClick(event)}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={() => handleTouchEnd(event)}
+                onTouchCancel={() => (pressStartTime.current = null)}
               >
-                <div className="absolute left-0 top-6 w-8 h-px bg-blue-200" />
-                <div className="absolute left-[-4px] top-[22px] w-3 h-3 bg-blue-500 rounded-full border-2 border-blue-200" />
-
-                <div
-                  className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer touch-manipulation"
-                  onClick={() => handleClick(event)}
-                  onTouchStart={handleTouchStart}
-                  onTouchEnd={() => handleTouchEnd(event)}
-                  onTouchCancel={() => (pressStartTime.current = null)}
-                >
-                  <h3 className="text-xl font-bold text-blue-600">
-                    {event.year}年{event.month}月
-                  </h3>
-                  <h4 className="text-lg font-semibold mt-2">{event.title}</h4>
-                </div>
-
-                {index !== timelineData.length - 1 && (
-                  <div className="absolute left-4 top-12 bottom-[-2rem] w-px bg-blue-200 opacity-50" />
-                )}
+                <h3 className="text-xl font-bold text-blue-600">
+                  {event.year}年{event.month}月
+                </h3>
+                <h4 className="text-lg font-semibold mt-2">{event.title}</h4>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
