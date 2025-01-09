@@ -37,23 +37,11 @@ const Timeline = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
   const pressStartTime = useRef<number | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [highlightedEventId, setHighlightedEventId] = useState<number | null>(
-    null
-  );
 
   // 指定した年のイベントまでスクロール
   const scrollToYear = useCallback(
     (year: number) => {
       if (!timelineRef.current) return;
-
-      const selectedEvent = timelineData.find((event) => event.year === year);
-      if (selectedEvent) {
-        setHighlightedEventId(selectedEvent.id);
-        // 3秒後にハイライトを解除
-        setTimeout(() => {
-          setHighlightedEventId(null);
-        }, 3000);
-      }
 
       const elements =
         timelineRef.current.getElementsByClassName("timeline-item");
@@ -172,7 +160,7 @@ const Timeline = () => {
                     href="#"
                     className="block px-2 py-2 text-lg hover:bg-gray-100 rounded"
                   >
-                    年表についてaaaaaaaaaaaaaaaaaa
+                    年表について
                   </a>
                   <a
                     href="#"
@@ -199,35 +187,42 @@ const Timeline = () => {
       </header>
 
       {/* 固定年号表示とコントロール */}
-      <div className="fixed top-16 left-0 right-0 h-12 bg-white/80 backdrop-blur-sm border-b border-gray-200 z-40 flex items-center justify-center">
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
+      <div className="fixed top-16 left-0 right-0 h-12 bg-white/80 backdrop-blur-sm border-b border-gray-200 z-40 flex items-center">
+        <div className="w-full max-w-6xl mx-auto px-4 grid grid-cols-3 items-center">
+          {/* 左側のボタン */}
+          <div className="flex items-center gap-2 justify-start">
+            <button
+              onClick={() => changeYear(-50)}
+              className="px-2 py-1 text-sm bg-blue-200 hover:bg-blue-300 text-blue-800 rounded transition-colors"
+            >
+              -50
+            </button>
             <button
               onClick={() => changeYear(-10)}
               className="px-2 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
             >
               -10
             </button>
+          </div>
+
+          {/* 中央の年号表示 */}
+          <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-blue-600 text-center whitespace-nowrap">
+            {currentYear}年 ({EraConvert(currentYear)})
+          </div>
+
+          {/* 右側のボタン */}
+          <div className="flex items-center gap-2 justify-end">
             <button
               onClick={() => changeYear(10)}
               className="px-2 py-1 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
             >
               +10
             </button>
-            <div className="text-2xl font-bold text-blue-600">
-              {currentYear}年 ({EraConvert(currentYear)})
-            </div>
             <button
-              onClick={() => changeYear(-100)}
+              onClick={() => changeYear(50)}
               className="px-2 py-1 text-sm bg-blue-200 hover:bg-blue-300 text-blue-800 rounded transition-colors"
             >
-              -100
-            </button>
-            <button
-              onClick={() => changeYear(100)}
-              className="px-2 py-1 text-sm bg-blue-200 hover:bg-blue-300 text-blue-800 rounded transition-colors"
-            >
-              +100
+              +50
             </button>
           </div>
         </div>
@@ -239,9 +234,7 @@ const Timeline = () => {
           {timelineData.map((event) => (
             <div
               key={event.id}
-              className={`timeline-item relative mb-8 ${
-                highlightedEventId === event.id ? "animate-highlight" : ""
-              }`}
+              className={"timeline-item relative mb-8"}
               data-year={event.year}
             >
               <div
