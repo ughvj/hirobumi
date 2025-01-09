@@ -20,7 +20,6 @@ import {
 
 import timelineData from "./events.json";
 
-import Image from "next/image";
 import EraConvert from "../utils/util";
 import SearchPopover from "./combobox";
 
@@ -153,7 +152,10 @@ const Timeline = () => {
                   <Menu size={24} />
                 </button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[40vw] border-r">
+              <SheetContent
+                side="left"
+                className="w-fit max-w-[70vw] min-w-[200px] border-r"
+              >
                 <SheetHeader>
                   <SheetTitle className="text-xl font-bold">
                     メニュー
@@ -170,7 +172,7 @@ const Timeline = () => {
                     href="#"
                     className="block px-2 py-2 text-lg hover:bg-gray-100 rounded"
                   >
-                    年表について
+                    年表についてaaaaaaaaaaaaaaaaaa
                   </a>
                   <a
                     href="#"
@@ -187,13 +189,6 @@ const Timeline = () => {
                 </nav>
               </SheetContent>
             </Sheet>
-            <Image
-              src="/logo.png"
-              alt="説明テキスト"
-              width={500}
-              height={500}
-              className="h-12 w-auto object-contain"
-            />
           </div>
 
           {/* 右側：検索コンボボックス */}
