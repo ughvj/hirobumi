@@ -1,21 +1,14 @@
 import * as React from "react";
-import { Search, Check, ChevronsUpDown } from "lucide-react";
+import { Search, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-interface SearchComboboxProps {
+interface SearchPopoverProps {
   events: Array<{
     id: number;
     year: number;
@@ -25,49 +18,51 @@ interface SearchComboboxProps {
   onEventSelect: (year: number) => void;
 }
 
-export function SearchCombobox({ events, onEventSelect }: SearchComboboxProps) {
+export function SearchPopover({ events, onEventSelect }: SearchPopoverProps) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [selectedEvent, setSelectedEvent] = React.useState<string>("");
 
-  const handleSelect = React.useCallback(
-    (currentValue: string) => {
-      setValue(currentValue);
+  // 検索結果のフィルタリング
+  const filteredEvents = React.useMemo(() => {
+    return events.filter((event) =>
+      event.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [events, searchTerm]);
+
+  // イベント選択時の処理
+  const handleEventSelect = React.useCallback(
+    (event: { year: number; title: string }) => {
+      setSelectedEvent(event.title);
+      onEventSelect(event.year);
       setOpen(false);
-      const selectedEvent = events.find(
-        (event) => event.title === currentValue
-      );
-      if (selectedEvent) {
-        onEventSelect(selectedEvent.year);
-      }
     },
-    [events, onEventSelect]
+    [onEventSelect]
   );
 
+  // 検索ボタンクリック時の処理
   const handleSearch = React.useCallback(() => {
-    if (value) {
-      const selectedEvent = events.find((event) => event.title === value);
-      if (selectedEvent) {
-        onEventSelect(selectedEvent.year);
+    if (selectedEvent) {
+      const event = events.find((e) => e.title === selectedEvent);
+      if (event) {
+        onEventSelect(event.year);
       }
     }
-  }, [value, events, onEventSelect]);
+  }, [selectedEvent, events, onEventSelect]);
 
+  // キーボードイベントの処理
   const handleKeyDown = React.useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Enter") {
-        handleSearch();
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      // IMEの変換確定時は処理をスキップ
+      if (e.nativeEvent.isComposing || e.key === "Process") {
+        return;
+      }
+
+      if (e.key === "Enter" && filteredEvents.length > 0) {
+        handleEventSelect(filteredEvents[0]);
       }
     },
-    [handleSearch]
-  );
-
-  const filteredEvents = React.useMemo(
-    () =>
-      events.filter((event) =>
-        event.title.toLowerCase().includes(searchTerm.toLowerCase())
-      ),
-    [events, searchTerm]
+    [filteredEvents, handleEventSelect]
   );
 
   return (
@@ -80,38 +75,41 @@ export function SearchCombobox({ events, onEventSelect }: SearchComboboxProps) {
             aria-expanded={open}
             className="w-64 justify-between"
           >
-            {value || "出来事を検索..."}
+            {selectedEvent || "イベントを検索..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-64 p-0">
-          <Command>
-            <CommandList>
-              <CommandInput
-                placeholder="出来事を検索..."
-                value={searchTerm}
-                onValueChange={setSearchTerm}
-                onKeyDown={handleKeyDown}
-              />
-              <CommandEmpty>出来事が見つかりません</CommandEmpty>
-              <CommandGroup>
-                {filteredEvents.map((event) => (
-                  <CommandItem
-                    key={event.id}
-                    value={event.title}
-                    onSelect={handleSelect}
-                  >
-                    <Check
-                      className={`mr-2 h-4 w-4 ${
-                        value === event.title ? "opacity-100" : "opacity-0"
-                      }`}
-                    />
-                    {event.title}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
+        <PopoverContent className="w-64 p-2" align="end">
+          <div className="space-y-2">
+            <Input
+              type="text"
+              placeholder="イベントを検索..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-full"
+            />
+            <div className="max-h-60 overflow-y-auto">
+              {filteredEvents.length === 0 ? (
+                <div className="text-sm text-gray-500 text-center py-2">
+                  イベントが見つかりません
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {filteredEvents.map((event) => (
+                    <Button
+                      key={event.id}
+                      variant="ghost"
+                      className="w-full justify-start text-left font-normal"
+                      onClick={() => handleEventSelect(event)}
+                    >
+                      {event.title}
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </PopoverContent>
       </Popover>
       <Button
@@ -126,4 +124,4 @@ export function SearchCombobox({ events, onEventSelect }: SearchComboboxProps) {
   );
 }
 
-export default SearchCombobox;
+export default SearchPopover;

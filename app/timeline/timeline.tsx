@@ -22,7 +22,7 @@ import timelineData from "./events.json";
 
 import Image from "next/image";
 import EraConvert from "../utils/util";
-import SearchCombobox from "./combobox";
+import SearchPopover from "./combobox";
 
 interface TimelineEvent {
   year: number;
@@ -38,31 +38,46 @@ const Timeline = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
   const pressStartTime = useRef<number | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [highlightedEventId, setHighlightedEventId] = useState<number | null>(
+    null
+  );
 
   // 指定した年のイベントまでスクロール
-  const scrollToYear = useCallback((year: number) => {
-    if (!timelineRef.current) return;
+  const scrollToYear = useCallback(
+    (year: number) => {
+      if (!timelineRef.current) return;
 
-    const elements =
-      timelineRef.current.getElementsByClassName("timeline-item");
-    for (let i = 0; i < elements.length; i++) {
-      const element = elements[i] as HTMLElement;
-      const elementYear = Number(element.getAttribute("data-year"));
-
-      if (elementYear >= year) {
-        const headerOffset = 120;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition =
-          elementPosition + window.pageYOffset - headerOffset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth",
-        });
-        break;
+      const selectedEvent = timelineData.find((event) => event.year === year);
+      if (selectedEvent) {
+        setHighlightedEventId(selectedEvent.id);
+        // 3秒後にハイライトを解除
+        setTimeout(() => {
+          setHighlightedEventId(null);
+        }, 3000);
       }
-    }
-  }, []);
+
+      const elements =
+        timelineRef.current.getElementsByClassName("timeline-item");
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i] as HTMLElement;
+        const elementYear = Number(element.getAttribute("data-year"));
+
+        if (elementYear >= year) {
+          const headerOffset = 120;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition =
+            elementPosition + window.pageYOffset - headerOffset;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth",
+          });
+          break;
+        }
+      }
+    },
+    [timelineData]
+  );
 
   // 年号の増減処理
   const changeYear = useCallback(
@@ -182,10 +197,7 @@ const Timeline = () => {
 
           {/* 右側：検索コンボボックス */}
           <div className="flex-shrink-0">
-            <SearchCombobox
-              events={timelineData}
-              onEventSelect={scrollToYear}
-            />
+            <SearchPopover events={timelineData} onEventSelect={scrollToYear} />
           </div>
         </div>
       </header>
@@ -234,7 +246,9 @@ const Timeline = () => {
             {timelineData.map((event, index) => (
               <div
                 key={event.id}
-                className="timeline-item relative mb-8"
+                className={`timeline-item relative mb-8 ${
+                  highlightedEventId === event.id ? "animate-highlight" : ""
+                }`}
                 data-year={event.year}
               >
                 <div className="absolute left-0 top-6 w-8 h-px bg-blue-200" />
