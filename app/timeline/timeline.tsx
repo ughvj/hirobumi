@@ -21,6 +21,8 @@ import {
 import timelineData from "./events.json";
 
 import Image from "next/image";
+import EraConvert from "../utils/util";
+import SearchCombobox from "./combobox";
 
 interface TimelineEvent {
   year: number;
@@ -127,51 +129,64 @@ const Timeline = () => {
     <div className="min-h-screen bg-gray-50">
       {/* 固定ヘッダー */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-white shadow-md z-50">
-        <div className="max-w-lg mx-auto px-4 h-full flex items-center">
-          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <SheetTrigger asChild>
-              <button className="p-2 hover:bg-gray-100 rounded-full">
-                <Menu size={24} />
-              </button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[40vw] border-r">
-              <SheetHeader>
-                <SheetTitle className="text-xl font-bold">メニュー</SheetTitle>
-              </SheetHeader>
-              <nav className="space-y-4 mt-6">
-                <a
-                  href="#"
-                  className="block px-2 py-2 text-lg hover:bg-gray-100 rounded"
-                >
-                  ホーム
-                </a>
-                <a
-                  href="#"
-                  className="block px-2 py-2 text-lg hover:bg-gray-100 rounded"
-                >
-                  年表について
-                </a>
-                <a
-                  href="#"
-                  className="block px-2 py-2 text-lg hover:bg-gray-100 rounded"
-                >
-                  カテゴリー
-                </a>
-                <a
-                  href="#"
-                  className="block px-2 py-2 text-lg hover:bg-gray-100 rounded"
-                >
-                  設定
-                </a>
-              </nav>
-            </SheetContent>
-          </Sheet>
-          <Image
-            src="/logo.png" // 画像のURL (publicディレクトリにある場合は相対パス)
-            alt="説明テキスト"
-            width={100} // 表示する幅
-            height={100} // 表示する高さ
-          />
+        <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
+          {/* 左側：メニューとロゴ */}
+          <div className="flex items-center space-x-4">
+            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+              <SheetTrigger asChild>
+                <button className="p-2 hover:bg-gray-100 rounded-full">
+                  <Menu size={24} />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[40vw] border-r">
+                <SheetHeader>
+                  <SheetTitle className="text-xl font-bold">
+                    メニュー
+                  </SheetTitle>
+                </SheetHeader>
+                <nav className="space-y-4 mt-6">
+                  <a
+                    href="#"
+                    className="block px-2 py-2 text-lg hover:bg-gray-100 rounded"
+                  >
+                    ホーム
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-2 py-2 text-lg hover:bg-gray-100 rounded"
+                  >
+                    年表について
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-2 py-2 text-lg hover:bg-gray-100 rounded"
+                  >
+                    カテゴリー
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-2 py-2 text-lg hover:bg-gray-100 rounded"
+                  >
+                    設定
+                  </a>
+                </nav>
+              </SheetContent>
+            </Sheet>
+            <Image
+              src="/logo.png" // 画像のURL (publicディレクトリにある場合は相対パス)
+              alt="説明テキスト"
+              width={100} // 表示する幅
+              height={100} // 表示する高さ
+            />
+          </div>
+
+          {/* 右側：検索コンボボックス */}
+          <div className="flex-shrink-0">
+            <SearchCombobox
+              events={timelineData}
+              onEventSelect={scrollToYear}
+            />
+          </div>
         </div>
       </header>
 
@@ -192,7 +207,7 @@ const Timeline = () => {
               +10
             </button>
             <div className="text-2xl font-bold text-blue-600">
-              {currentYear}年
+              {currentYear}年 ({EraConvert(currentYear)})
             </div>
             <button
               onClick={() => changeYear(-100)}
@@ -218,7 +233,7 @@ const Timeline = () => {
 
             {timelineData.map((event, index) => (
               <div
-                key={event.year}
+                key={event.id}
                 className="timeline-item relative mb-8"
                 data-year={event.year}
               >
@@ -233,7 +248,7 @@ const Timeline = () => {
                   onTouchCancel={() => (pressStartTime.current = null)}
                 >
                   <h3 className="text-xl font-bold text-blue-600">
-                    {event.year}年
+                    {event.year}年{event.month}月
                   </h3>
                   <h4 className="text-lg font-semibold mt-2">{event.title}</h4>
                 </div>
